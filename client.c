@@ -36,8 +36,7 @@ V _rn(){Buf o=bk(32768);
   if(m->t=='!'){
    bw(o,"\x1b[%sm%s"RS"\r\n",co,m->x);
   }el{C hdr[64];I hl=0;
-   if(_ts){sf(hdr,"[%s] <%s>",m->tm,m->n);hl=ln(hdr);}
-   el{sf(hdr,"<%s>",m->n);hl=ln(hdr);}
+   sf(hdr,"<%s>",m->n);hl=ln(hdr);
    C*t=m->x;I fl=1;
    wl(*t){I w=fl?Wi-1-hl:Wi-2;if(w<4)w=Wi-3;I tl=ln(t);
     if(tl<=w){bw(o,"\x1b[%sm%s%s"RS"\r\n",co,fl?hdr:"  ",t);br;}
@@ -70,6 +69,7 @@ V _ir(C*l){C*pf="",*rest=l,nn[32]="",*tr="";
  el if(cl==4&&!strncmp(rest,"QUIT",4)){C buf[96];sf(buf,"%s quit%s%s",nn,*tr?" ":"",tr);_ps('!',"",buf);}
  el if(cl==4&&!strncmp(rest,"PART",4)){C*ch=tk(rest,1);if(*ch==':')ch++;C buf[96];sf(buf,"%s left %s",nn,ch);_ps('!',"",buf);}
  el if(cl==4&&!strncmp(rest,"NICK",4)){C*ne=a(rest," ");if(*ne==':')ne++;C buf[64];sf(buf,"%s → %s",nn,ne);_ps('!',"",buf);}
+ el if(cl==3&&!strncmp(rest,"372",3)){if(*tr==' '&&tr[1]=='-')tr+=3;el if(*tr=='-')tr+=2;_ps('!',"",tr);}
  el if(*rest>='0'&&*rest<='9'){if(*tr)_ps('!',"",tr);}
 }
 
