@@ -36,6 +36,44 @@ if no nick is given, a random one is generated (e.g. `u4x8q`). default channel i
 | `Ctrl+W` | delete word |
 | `Ctrl+C` | quit |
 
+## client (C)
+
+a C rewrite using [tinyc.h](https://github.com/koharu-beepboop/tinyc) — same features, compiled binary, no runtime deps.
+
+```
+cc -o client client.c -I/path/to/tinyc
+```
+
+or if tinyc.h is in your include path:
+
+```
+cc -o client client.c
+```
+
+### slash commands (same as JS client)
+
+| cmd | description |
+|-----|-------------|
+| `/j #chan` | join a channel |
+| `/p` | part current channel |
+| `/q [msg]` | quit with optional message |
+| `/n nick` | change nick |
+| `/m user msg` | private message a user |
+| `/t` | toggle timestamps |
+| `/clear` | clear message buffer |
+| `/h` | show help |
+
+### keyboard shortcuts (same as JS client)
+
+| key | action |
+|-----|--------|
+| `↑` / `↓` | scroll buffer |
+| `PgUp` / `PgDn` | scroll page |
+| `Ctrl+L` | redraw screen |
+| `Ctrl+U` | clear input |
+| `Ctrl+W` | delete word |
+| `Ctrl+C` | quit |
+
 ## server.js
 
 a full IRC server in **49 lines** of JavaScript, built on bun's TCP listener. fully compatible with **weechat**, **irssi**, **hexchat**, and any RFC-compliant IRC client.
@@ -65,9 +103,9 @@ listens on port **6667** on all interfaces. password auth via `PASS` env var.
 
 ## tech
 
-- **runtime:** [bun](https://bun.sh) (server), node/bun (client)
-- **dependencies:** zero. everything is from scratch using built-in modules (`net`, `Bun.listen`)
-- **client:** raw ANSI terminal rendering — 83 lines
+- **runtime:** [bun](https://bun.sh) (server), bun or bare `cc` (client)
+- **dependencies:** zero. everything from scratch using built-in modules or [tinyc.h](https://github.com/koharu-beepboop/tinyc)
+- **client:** raw ANSI terminal rendering — 83 lines (JS) / 158 lines (C)
 - **server:** full IRC protocol subset — 49 lines
 
 ## why
