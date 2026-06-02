@@ -2,15 +2,19 @@
 
 a tiny IRC ecosystem — a terminal client and a server, both written from scratch with zero dependencies ✨
 
-## client.js
+## client
 
-a terminal-based IRC client with a raw-ANSI interface. connects to any IRC server on port 6667.
+a C client using [tinyc.h](https://github.com/koharu-beepboop/tinyc) — compiled binary, no runtime deps.
 
 ```
-bun client.js [nick] [channel]
+cc -o client client.c -I/path/to/tinyc
 ```
 
-if no nick is given, a random one is generated (e.g. `u4x8q`). default channel is `#chat`.
+or if tinyc.h is in your include path:
+
+```
+cc -o client client.c
+```
 
 ### slash commands
 
@@ -26,44 +30,6 @@ if no nick is given, a random one is generated (e.g. `u4x8q`). default channel i
 | `/h` | show help |
 
 ### keyboard shortcuts
-
-| key | action |
-|-----|--------|
-| `↑` / `↓` | scroll buffer |
-| `PgUp` / `PgDn` | scroll page |
-| `Ctrl+L` | redraw screen |
-| `Ctrl+U` | clear input |
-| `Ctrl+W` | delete word |
-| `Ctrl+C` | quit |
-
-## client (C)
-
-a C rewrite using [tinyc.h](https://github.com/koharu-beepboop/tinyc) — same features, compiled binary, no runtime deps.
-
-```
-cc -o client client.c -I/path/to/tinyc
-```
-
-or if tinyc.h is in your include path:
-
-```
-cc -o client client.c
-```
-
-### slash commands (same as JS client)
-
-| cmd | description |
-|-----|-------------|
-| `/j #chan` | join a channel |
-| `/p` | part current channel |
-| `/q [msg]` | quit with optional message |
-| `/n nick` | change nick |
-| `/m user msg` | private message a user |
-| `/t` | toggle timestamps |
-| `/clear` | clear message buffer |
-| `/h` | show help |
-
-### keyboard shortcuts (same as JS client)
 
 | key | action |
 |-----|--------|
@@ -103,9 +69,9 @@ listens on port **6667** on all interfaces. password auth via `PASS` env var.
 
 ## tech
 
-- **runtime:** [bun](https://bun.sh) (server), bun or bare `cc` (client)
+- **runtime:** [bun](https://bun.sh) (server), bare `cc` (client)
 - **dependencies:** zero. everything from scratch using built-in modules or [tinyc.h](https://github.com/koharu-beepboop/tinyc)
-- **client:** raw ANSI terminal rendering — 83 lines (JS) / 158 lines (C)
+- **client:** raw ANSI terminal rendering — 158 lines (C)
 - **server:** full IRC protocol subset — 49 lines
 
 ## why
