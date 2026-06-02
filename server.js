@@ -9,8 +9,8 @@ if(s.h)for(let h of s.h)for(let x of C.get(h))x.write(`:${o}!${s.u||o}@0 NICK :$
 else if(c=="USER"){let u=a[1];if(s.n&&N.has(s.n)&&N.get(s.n)!==s){s.write(`:server 433 * ${s.n} :Nickname is already in use\r\n`)}
 else if(P&&s.p!==P){R(s,464,`:Password incorrect`);s.end()}
 else{s.u=u;N.set(s.n,s)
-R(s,1,`:Welcome ${s.n}!${u}@0`);R(s,4,`server tiny * *`);R(s,376,`:End of /MOTD`)}}
-else if(c=="JOIN"){let h=a[1];let nw=!C.has(h);if(nw){C.set(h,new Set);O.set(h,new Set);M.set(h,"nt")}C.get(h).add(s);if(nw)O.get(h).add(s);(s.h||=[]).push(h)
+R(s,1,`:Welcome ${s.n}!${u}@0`);R(s,4,`server tiny * *`);R(s,372,`:- wuna chat`);R(s,372,`:- be epiku`);R(s,372,`:- dont fak things up`);R(s,376,`:End of /MOTD`)}
+}else if(c=="JOIN"){let h=a[1];let nw=!C.has(h);if(nw){C.set(h,new Set);O.set(h,new Set);M.set(h,"nt")}C.get(h).add(s);if(nw)O.get(h).add(s);(s.h||=[]).push(h)
 for(let x of C.get(h))x.write(`:${s.n}!${s.u||s.n}@0 JOIN ${h}\r\n`)}
 else if(c=="PART"){let h=a[1];C.get(h)?.delete(s);O.get(h)?.delete(s);s.h=s.h?.filter(x=>x!==h)
 for(let x of C.get(h)||[])x.write(`:${s.n}!${s.u||s.n}@0 PART ${h}\r\n`);let ch=C.get(h);if(ch&&!ch.size){C.delete(h);T.delete(h);O.delete(h);M.delete(h)}}
