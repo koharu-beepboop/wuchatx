@@ -42,7 +42,7 @@ cc -o client client.c
 
 ## server
 
-a full IRC server in **465 lines** of C using [tinyc.h](https://github.com/koharu-beepboop/tinyc). fully compatible with **weechat**, **irssi**, **hexchat**, and any RFC-compliant IRC client.
+a full IRC server in **107 lines** of C using [tinyc.h](https://github.com/koharu-beepboop/tinyc). fully compatible with **weechat**, **irssi**, **hexchat**, and any RFC-compliant IRC client.
 
 ```
 cc -o server server.c
@@ -72,7 +72,7 @@ listens on port **6667** on all interfaces. password auth via `PASS` env var.
 - **runtime:** bare `cc` (client and server)
 - **dependencies:** zero. everything from scratch using [tinyc.h](https://github.com/koharu-beepboop/tinyc)
 - **client:** raw ANSI terminal rendering — 151 lines
-- **server:** full IRC protocol subset — 465 lines
+- **server:** full IRC protocol subset — 107 lines
 
 ## why
 
