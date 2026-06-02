@@ -40,12 +40,12 @@ cc -o client client.c
 | `Ctrl+W` | delete word |
 | `Ctrl+C` | quit |
 
-## server.js
+## server
 
-a full IRC server in **49 lines** of JavaScript, built on bun's TCP listener. fully compatible with **weechat**, **irssi**, **hexchat**, and any RFC-compliant IRC client.
+a full IRC server in **465 lines** of C using [tinyc.h](https://github.com/koharu-beepboop/tinyc). fully compatible with **weechat**, **irssi**, **hexchat**, and any RFC-compliant IRC client.
 
 ```
-bun server.js
+cc -o server server.c
 ```
 
 listens on port **6667** on all interfaces. password auth via `PASS` env var.
@@ -69,10 +69,10 @@ listens on port **6667** on all interfaces. password auth via `PASS` env var.
 
 ## tech
 
-- **runtime:** [bun](https://bun.sh) (server), bare `cc` (client)
-- **dependencies:** zero. everything from scratch using built-in modules or [tinyc.h](https://github.com/koharu-beepboop/tinyc)
-- **client:** raw ANSI terminal rendering — 158 lines (C)
-- **server:** full IRC protocol subset — 49 lines
+- **runtime:** bare `cc` (client and server)
+- **dependencies:** zero. everything from scratch using [tinyc.h](https://github.com/koharu-beepboop/tinyc)
+- **client:** raw ANSI terminal rendering — 151 lines
+- **server:** full IRC protocol subset — 465 lines
 
 ## why
 
