@@ -2,7 +2,6 @@
 #include "tinyc.h"
 #include <netdb.h>
 #include <errno.h>
-#define _wr(s) wr(1,s)
 
 // ── message ring ──
 typedef struct { C t; C n[32]; C x[320]; C tm[6]; } Msg;  // t:'!'=sys '>'=own '<'=other
@@ -19,19 +18,15 @@ C _in[1024]; I _il;
 V _ps(C t,C*n,C*x){Msg m={t};I l=mn(ln(x),319);mv(m.x,x,l);m.x[l]=0;
  if(n){I nl=mn(ln(n),31);mv(m.n,n,nl);m.n[nl]=0;}z(m.tm);rp(M,m);}
 
-// ── check if nick appears in text (case-insensitive) ──
-I _hm(C*t,C*nk){C b[320],u[32];I i=0;wl(*t&&i<319)b[i++]=*t<'a'||*t>'z'?*t:*t-32;b[i]=0;
- i=0;wl(*nk&&i<31)u[i++]=*nk<'a'||*nk>'z'?*nk:*nk-32;u[i]=0;rt f(b,u)>=0;}
-
 // ── render screen ──
 V _rn(){Buf o=bk(32768);
- bw(o,"\x1b]0;%s%s\x1b\\",_ch,_sc?" ▲":"");
+{C _t[96];sf(_t,"%s%s",_ch,_sc?" ▲":"");tt(_t);}
  bw(o,CL RV";36m %s %s%d/%d "RS"\r\n",_ch,_sc?"▲":" ",_sc,rl(M));
  I tot=rl(M),vis=He-2,end=mx(0,tot-_sc),start=mx(0,end-vis);
  for(I i=start;i<end;i++){Msg*m=&ro(M,i);C*co="36";
   if(m->t=='!')co="33";
   el if(m->t=='>')co="32";
-  el if(m->t=='<'&&_hm(m->x,_nk))co="1;36";
+  el if(m->t=='<'&&fc(m->x,_nk)>=0)co="1;36";
   if(_ts)bw(o,"\x1b[2m[%s]\x1b[22m ",m->tm);
   if(m->t=='!'){
    bw(o,"\x1b[%sm%s"RS"\r\n",co,m->x);
@@ -50,7 +45,7 @@ V _rn(){Buf o=bk(32768);
  C pi[1024];I pil=mn(_il,Wi-7-nkl);mv(pi,_in,pil);pi[pil]=0;
  bw(o,RV"[%s] > %s"RS,pnk,pi);
  bw(o,"\x1b[%d;1H\x1b[?25l",He);
- _wr(bd(o));bf(o);}
+ w1(bd(o));bf(o);}
 
 // ── signal handlers ──
 V _sw(I sig){(V)sig;s();_rr=1;}
@@ -95,7 +90,7 @@ I main(I c,C**v){
  if(eq(_nk,"u")){C rb[4];rn(rb,4);
   fr(i,4){C x=(U)rb[i]%36;_nk[1+i]=x<10?'0'+x:'a'+x-10;}_nk[5]=0;}
  r(1);s();sg(SIGPIPE,SIG_IGN);sg(SIGWINCH,_sw);sg(SIGINT,_si);
- _wr("\x1b[?25l");
+ w1("\x1b[?25l");
  fi{
   if(_rq)br;
   if(_fd<0&&time(0)>=_wt){
@@ -120,11 +115,10 @@ I main(I c,C**v){
    C*s=_nb;wl(1){C*e=s?strchr(s,'\n'):N;if(!e)br;
     *e=0;if(e>s&&e[-1]=='\r')e[-1]=0;_ir(s);s=e+1;}
    _nn-=s-_nb;if(_nn>0)mv(_nb,s,_nn);_nb[_nn]=0;}
-  if(FD_ISSET(0,&F)){C kb[16];I n=read(0,kb,16);if(n<1)ct;
-   fr(i,n){C k=kb[i];
-    if(k==3){_rq=1;br;}el if(k==12){_rn();}
-    el if(k==21){_il=0;_in[0]=0;}el if(k==23){wl(_il>0&&_in[_il-1]==32)_il--;wl(_il>0&&_in[_il-1]!=32)_il--;_in[_il]=0;}
-    el if(k==13||k==10){C*t=_in;wl(*t==32)t++;
+  if(FD_ISSET(0,&F)){I k=ky();if(!k||k==27)ct;
+   if(k==3){_rq=1;}el if(k==12){_rn();}
+   el if(k==21){_il=0;_in[0]=0;}el if(k==23){wl(_il>0&&_in[_il-1]==32)_il--;wl(_il>0&&_in[_il-1]!=32)_il--;_in[_il]=0;}
+   el if(k==13||k==10){C*t=_in;wl(*t==32)t++;
      if(*t=='/'){C*cmd=t+1;I cl=ln(cmd),sp=f(cmd," ");C*arg=cmd+cl;
       if(sp>=0){cl=sp;arg=cmd+sp+1;}
       if(!cl);
@@ -148,11 +142,10 @@ I main(I c,C**v){
      }el if(*t){_ps('>',_nk,t);if(_fd>=0)dp(_fd,"PRIVMSG %s :%s\r\n",_ch,t);}
      _il=0;_in[0]=0;_sc=0;}
     el if(k==127){if(_il>0)_in[--_il]=0;}
-    el if(k==27&&i+2<n&&kb[i+1]==91){C d=kb[i+2];
-     if(d==65)_sc++;el if(d==66&&_sc>0)_sc--;el if(d==53)_sc+=He;el if(d==54)_sc-=mn(_sc,He);i+=2;}
-    el if(k>=32&&k<127&&_il<1023){_in[_il++]=k;_in[_il]=0;}
-   }}
+    el if(k==-1){_sc++;}el if(k==-2&&_sc>0){_sc--;}
+    el if(k==-5){_sc+=He;}el if(k==-6){_sc-=mn(_sc,He);}
+    el if(k>=32&&k<127&&_il<1023){_in[_il++]=k;_in[_il]=0;}}
   _rn();}
  if(_fd>=0){wr(_fd,"QUIT :bye\r\n");cl(_fd);}
- r(0);_wr("\x1b[?25h"RS"\n");rt 0;
+ r(0);w1("\x1b[?25h"RS"\n");rt 0;
 }
