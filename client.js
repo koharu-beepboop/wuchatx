@@ -1,7 +1,7 @@
-let p=process,[nick,chan]=[...p.argv.slice(2),"u"+Math.random().toString(36).slice(-4),"#chat"],M=[],I="",S=0,B="",T=1
+let p=process,[nick="u"+Math.random().toString(36).slice(-4),srv="localhost",prt="6667",chan="#chat"]=p.argv.slice(2),M=[],I="",S=0,B="",T=1
 p.stdin.isTTY&&p.stdin.setRawMode(1)
-let{W=80,H=24}=p.stdout,c=require("net").connect(6667)
-let Q=m=>{p.stdout.write("\x1b[?25h\x1b[m\n"+(m||""));p.stdin.isTTY&&p.stdin.setRawMode(0);c.end();p.exit()}
+let{W=80,H=24}=p.stdout,c
+let Q=m=>{Q.q=1;p.stdout.write("\x1b[?25h\x1b[m\n"+(m||""));p.stdin.isTTY&&p.stdin.setRawMode(0);c.end();p.exit()}
 let ts=()=>{let d=new Date();return("0"+d.getHours()).slice(-2)+":"+("0"+d.getMinutes()).slice(-2)}
 let R=()=>{
   let o=`\x1b]0;${chan}${S?" ▲"+S:""}\x1b\\\x1b[2J\x1b[H\x1b[7;36m ${chan} ${S?"▲"+S+"/"+M.length:" "}\x1b[m\r\n`
@@ -32,8 +32,7 @@ let R=()=>{
   o+=`\x1b[7m${pr}${pi}\x1b[m\x1b[${H+1};${pr.length+pi.length+1}H\x1b[?25h`
   p.stdout.write(o)
 }
-c.on("error",()=>{console.error("connection error");Q()})
-c.on("data",d=>{
+let connect=()=>{c=(prt=="6697"?require("tls"):require("net")).connect({port:+prt,host:srv,rejectUnauthorized:false},()=>{Q.b=1;if(Q.c)M.push(["!","reconnected",ts()]),Q.c=0,R();c.write(`NICK ${nick}\r\nUSER ${nick} 0 * :${nick}\r\nJOIN ${chan}\r\n`)});c.on("error",e=>{Q.e=e});c.on("close",()=>{if(Q.q)return;let e=Q.e;Q.e=null;Q.c=1;let b=Q.b=Math.min((Q.b||1)*2,60);M.push(["!",`disconnected${e?`: ${e.code||e.message||e}`:""} — retrying in ${b}s`,ts()]);R();setTimeout(connect,b*1e3)});c.on("data",d=>{
   B+=d;let i,l,a,r,n
   while(~(i=B.indexOf("\r\n"))){
     l=B.slice(0,i);B=B.slice(i+2)
@@ -48,8 +47,8 @@ c.on("data",d=>{
     else if(+a[1]>99){let m=l.split(" :").slice(1).join(" :");if(m)M.push(["!",m,ts()])}
   }
   R()
-})
-c.write(`NICK ${nick}\r\nUSER ${nick} 0 * :${nick}\r\nJOIN ${chan}\r\n`)
+})}
+connect()
 p.stdin.on("data",d=>{
   let k=d[0]
   if(k==3)Q()
