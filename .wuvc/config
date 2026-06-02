@@ -1,0 +1,6 @@
+{
+  "remote": {
+    "http://localhost:3000/wuchatx": "origin",
+    "origin": "http://localhost:3000/wuchatx"
+  }
+}
